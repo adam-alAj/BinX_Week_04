@@ -11,6 +11,7 @@ This week moves from building models to evaluating them properly: partitioning d
 |:---:|-------|----------|:------:|
 | 1 | Building a Three-Way Split (Train / Validation / Test) | [`Three_Way_Split.ipynb`](./Day1/Three_Way_Split.ipynb) | ✅ |
 | 2 | Cross-Validating a Model (5-Fold Cross-Validation) | [`Cross_Validation.ipynb`](./Day2/Cross_Validation.ipynb) | ✅ |
+| 3 | Diagnosing & Fixing Model Fit (Bias–Variance Tradeoff) | [`Diagnosing_Fixing_Model_Fit.ipynb`](./Day3/Diagnosing_Fixing_Model_Fit.ipynb) | ✅ |
 
 ---
 
@@ -21,6 +22,9 @@ Built a 60/20/20 Train / Validation / Test split on a synthetic dataset (1,000 s
 
 ### [Day 2 — Cross-Validating a Model (5-Fold Cross-Validation)](./Day2/README.md)
 Evaluated a `LogisticRegression` classifier with **leak-free 5-Fold Stratified Cross-Validation** on a synthetic customer-churn dataset (1,000 samples, 80/20 class split) via a manual fold loop — fitting `StandardScaler()` on each training fold only, then `LogisticRegression` with the weighted F1 metric — **Mean F1 0.8502 ± 0.0176**. Compared the CV estimate against a single stratified 80/20 split (**Single-Split F1 0.8227**, difference −0.0275) and explained why the single split was slightly pessimistic. Verified that `scikit-learn` auto-applies `StratifiedKFold` for classification and documented why stratification preserves the exact 80/20 class ratio in every fold, eliminating evaluation bias and preventing training failures.
+
+### [Day 3 — Diagnosing & Fixing Model Fit (Bias–Variance Tradeoff)](./Day3/README.md)
+Deliberately constructed three `DecisionTreeClassifier` states on a noisy synthetic dataset (1,000 samples, 20 features, `flip_y=0.15`, stratified 70/30 split) to make the **Bias–Variance Tradeoff** visible: an unconstrained tree (**100.00% train vs 69.33% val — gap 30.67%**) = overfitting (high variance); a Decision Stump with `max_depth=1` (**60.14% train vs 60.33% val**) = underfitting (high bias); and a regularized/pruned tree (`max_depth=5`, `min_samples_split=10`, `min_samples_leaf=5`) that raised **validation accuracy from 69.33% to 72.33%** while shrinking the **gap from 30.67% to 10.52%**. Documented all three states in a summary comparison table with diagnoses and key takeaways.
 
 ---
 
@@ -41,6 +45,12 @@ Evaluated a `LogisticRegression` classifier with **leak-free 5-Fold Stratified C
 | **Mean ± Std Reporting** | 2 | Final estimate 0.8502 ± 0.0176 across 5 folds |
 | **CV vs. Single-Split Comparison** | 2 | Single split (0.8227) vs. CV mean (0.8502) |
 | **Stratification Justification** | 2 | Preserving 80/20 class proportions in every fold |
+| **Bias–Variance Tradeoff** | 3 | Diagnosing high-variance (overfit) vs high-bias (underfit) models |
+| **Deliberate Overfitting** | 3 | Unconstrained tree (`max_depth=None`) — 100% train vs 69.33% val |
+| **Deliberate Underfitting** | 3 | Decision Stump (`max_depth=1`) — 60.14% train / 60.33% val |
+| **Hyperparameter Regularization** | 3 | `max_depth=5`, `min_samples_split=10`, `min_samples_leaf=5` |
+| **Train-vs-Val Gap Diagnosis** | 3 | Gap shrunk from 30.67% to 10.52% after regularization |
+| **Model Fit Documentation** | 3 | Summary comparison table + key takeaways |
 
 ---
 
@@ -53,6 +63,9 @@ BinX_Week_04/
 │   └── README.md
 ├── Day2/
 │   ├── Cross_Validation.ipynb
+│   └── README.md
+├── Day3/
+│   ├── Diagnosing_Fixing_Model_Fit.ipynb
 │   └── README.md
 └── README.md          ← You are here
 ```
