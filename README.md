@@ -12,6 +12,7 @@ This week moves from building models to evaluating them properly: partitioning d
 | 1 | Building a Three-Way Split (Train / Validation / Test) | [`Three_Way_Split.ipynb`](./Day1/Three_Way_Split.ipynb) | ✅ |
 | 2 | Cross-Validating a Model (5-Fold Cross-Validation) | [`Cross_Validation.ipynb`](./Day2/Cross_Validation.ipynb) | ✅ |
 | 3 | Diagnosing & Fixing Model Fit (Bias–Variance Tradeoff) | [`Diagnosing_Fixing_Model_Fit.ipynb`](./Day3/Diagnosing_Fixing_Model_Fit.ipynb) | ✅ |
+| 4 | Feature Engineering & Hyperparameter Tuning | [`Feature_Engineering_and_Tuning.ipynb`](./Day4/Feature_Engineering_and_Tuning.ipynb) | ✅ |
 
 ---
 
@@ -25,6 +26,9 @@ Evaluated a `LogisticRegression` classifier with **leak-free 5-Fold Stratified C
 
 ### [Day 3 — Diagnosing & Fixing Model Fit (Bias–Variance Tradeoff)](./Day3/README.md)
 Deliberately constructed three `DecisionTreeClassifier` states on a noisy synthetic dataset (1,000 samples, 20 features, `flip_y=0.15`, stratified 70/30 split) to make the **Bias–Variance Tradeoff** visible: an unconstrained tree (**100.00% train vs 69.33% val — gap 30.67%**) = overfitting (high variance); a Decision Stump with `max_depth=1` (**60.14% train vs 60.33% val**) = underfitting (high bias); and a regularized/pruned tree (`max_depth=5`, `min_samples_split=10`, `min_samples_leaf=5`) that raised **validation accuracy from 69.33% to 72.33%** while shrinking the **gap from 30.67% to 10.52%**. Documented all three states in a summary comparison table with diagnoses and key takeaways.
+
+### [Day 4 — Feature Engineering & Hyperparameter Tuning](./Day4/README.md)
+Engineered **two domain-driven features** on a synthetic telecom-churn dataset (1,000 samples, 6 features, `SEED=42`): `Total_Estimated_Spend` (`Monthly_Charges × Total_Tenure_Months` — Customer Lifetime Value) and `Support_Calls_Per_Tenure_Month` (`Support_Calls / Total_Tenure_Months` — "Frustration Density Index"), expanding the feature space from 6 to 8 and splitting 80/20 stratified (800/200). Benchmarked an untuned `RandomForestClassifier` baseline on raw features (**Mean F1 0.8830 ± 0.0366**) against a **`GridSearchCV`**-tuned Random Forest on engineered data — grid of `n_estimators [50, 100, 200]`, `max_depth [None, 5, 10]`, `min_samples_split [2, 5, 10]`, `max_features ['sqrt', 'log2']` (54 candidates, 270 fits) over 5-Fold `StratifiedKFold` with F1 scoring — best params `{max_depth: 10, max_features: 'log2', min_samples_split: 2, n_estimators: 50}` (**CV F1 0.8941**, **Test F1 0.8636**, **+3.16%** vs baseline 0.8372). Analyzed feature importances (`Total_Estimated_Spend` 11.11% vs 2.82% for the support-call ratio; Age/Monthly_Charges/Tenure strongest overall) and documented why `max_depth=10` + `max_features='log2'` controlled overfitting.
 
 ---
 
@@ -51,6 +55,14 @@ Deliberately constructed three `DecisionTreeClassifier` states on a noisy synthe
 | **Hyperparameter Regularization** | 3 | `max_depth=5`, `min_samples_split=10`, `min_samples_leaf=5` |
 | **Train-vs-Val Gap Diagnosis** | 3 | Gap shrunk from 30.67% to 10.52% after regularization |
 | **Model Fit Documentation** | 3 | Summary comparison table + key takeaways |
+| **Feature Engineering** | 4 | `Total_Estimated_Spend` (CLV) + `Support_Calls_Per_Tenure_Month` (Frustration Density) |
+| **Feature Justification** | 4 | Mathematical/domain rationale for each engineered feature |
+| **Hyperparameter Grid Definition** | 4 | `n_estimators`, `max_depth`, `min_samples_split`, `max_features` |
+| **GridSearchCV** | 4 | 54 candidates × 5 folds = 270 fits over `StratifiedKFold` |
+| **Tuned vs. Untuned Benchmarking** | 4 | Baseline (0.8830 ± 0.0366) vs. tuned (0.8941 CV, 0.8636 Test) |
+| **Feature Importance Analysis** | 4 | Gini importances — engineered vs. raw feature rankings |
+| **Hyperparameter Impact Analysis** | 4 | `max_depth` / `max_features` controlling overfitting |
+| **Leak-Free Tuning** | 4 | Test set untouched until final evaluation |
 
 ---
 
@@ -66,6 +78,9 @@ BinX_Week_04/
 │   └── README.md
 ├── Day3/
 │   ├── Diagnosing_Fixing_Model_Fit.ipynb
+│   └── README.md
+├── Day4/
+│   ├── Feature_Engineering_and_Tuning.ipynb
 │   └── README.md
 └── README.md          ← You are here
 ```
