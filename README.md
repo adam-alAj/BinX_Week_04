@@ -13,6 +13,7 @@ This week moves from building models to evaluating them properly: partitioning d
 | 2 | Cross-Validating a Model (5-Fold Cross-Validation) | [`Cross_Validation.ipynb`](./Day2/Cross_Validation.ipynb) | ✅ |
 | 3 | Diagnosing & Fixing Model Fit (Bias–Variance Tradeoff) | [`Diagnosing_Fixing_Model_Fit.ipynb`](./Day3/Diagnosing_Fixing_Model_Fit.ipynb) | ✅ |
 | 4 | Feature Engineering & Hyperparameter Tuning | [`Feature_Engineering_and_Tuning.ipynb`](./Day4/Feature_Engineering_and_Tuning.ipynb) | ✅ |
+| 5 | Tuned End-to-End Leakage-Free ML Pipeline (Mini-Project) | [`Tuned_End_to_End_Pipeline.ipynb`](./Day5-mini-project/Tuned_End_to_End_Pipeline.ipynb) | ✅ |
 
 ---
 
@@ -29,6 +30,9 @@ Deliberately constructed three `DecisionTreeClassifier` states on a noisy synthe
 
 ### [Day 4 — Feature Engineering & Hyperparameter Tuning](./Day4/README.md)
 Engineered **two domain-driven features** on a synthetic telecom-churn dataset (1,000 samples, 6 features, `SEED=42`): `Total_Estimated_Spend` (`Monthly_Charges × Total_Tenure_Months` — Customer Lifetime Value) and `Support_Calls_Per_Tenure_Month` (`Support_Calls / Total_Tenure_Months` — "Frustration Density Index"), expanding the feature space from 6 to 8 and splitting 80/20 stratified (800/200). Benchmarked an untuned `RandomForestClassifier` baseline on raw features (**Mean F1 0.8830 ± 0.0366**) against a **`GridSearchCV`**-tuned Random Forest on engineered data — grid of `n_estimators [50, 100, 200]`, `max_depth [None, 5, 10]`, `min_samples_split [2, 5, 10]`, `max_features ['sqrt', 'log2']` (54 candidates, 270 fits) over 5-Fold `StratifiedKFold` with F1 scoring — best params `{max_depth: 10, max_features: 'log2', min_samples_split: 2, n_estimators: 50}` (**CV F1 0.8941**, **Test F1 0.8636**, **+3.16%** vs baseline 0.8372). Analyzed feature importances (`Total_Estimated_Spend` 11.11% vs 2.82% for the support-call ratio; Age/Monthly_Charges/Tenure strongest overall) and documented why `max_depth=10` + `max_features='log2'` controlled overfitting.
+
+### [Day 5 — Tuned End-to-End Leakage-Free ML Pipeline (Mini-Project)](./Day5-mini-project/README.md)
+Built the **Week 4 mini-project**: a complete end-to-end, leakage-free churn-prediction pipeline on a synthetic dataset (1,000 samples, 5 features, stratified 80/20 split → 800/200) that encapsulates everything from Days 1–4. Wrapped custom feature engineering (`Support_Calls_Per_Tenure_Month` "Frustration Density Index" and `High_Value_Customer` flag) in a `FunctionTransformer` **inside** the `Pipeline`, preprocessed mixed types with a `ColumnTransformer` (`StandardScaler` + `OneHotEncoder(handle_unknown='ignore')`), and tuned the **entire pipeline end-to-end** with `GridSearchCV` (grid `classifier__n_estimators [50, 100, 200]`, `classifier__max_depth [3, 5, 10, None]`, `classifier__min_samples_split [2, 5, 10]` — 36 candidates × 5 folds = 180 fits) under 5-Fold `StratifiedKFold` with F1 scoring — **best CV F1 0.9945** at `{max_depth: 5, min_samples_split: 5, n_estimators: 200}`. Evaluated once on the untouched test set: **Test Accuracy 0.975 / Test F1 0.9645** vs. Dummy Baseline (0.650 / 0.0000) and Untuned Default Pipeline (0.965 / 0.9504), with a confusion-matrix heatmap and classification report. Documented the leakage-free guarantee (all preprocessing fitted per-fold inside the pipeline), the value-add over baselines, and how `max_depth=5` prevented overfitting.
 
 ---
 
@@ -63,6 +67,12 @@ Engineered **two domain-driven features** on a synthetic telecom-churn dataset (
 | **Feature Importance Analysis** | 4 | Gini importances — engineered vs. raw feature rankings |
 | **Hyperparameter Impact Analysis** | 4 | `max_depth` / `max_features` controlling overfitting |
 | **Leak-Free Tuning** | 4 | Test set untouched until final evaluation |
+| **End-to-End Pipeline** | 5 | `feature_engineering → preprocessing → classifier` in one `Pipeline` |
+| **In-Pipeline Feature Engineering** | 5 | `FunctionTransformer` creating features inside the pipeline (leak-free) |
+| **ColumnTransformer Preprocessing** | 5 | `StandardScaler` (numeric) + `OneHotEncoder(handle_unknown='ignore')` (categorical) |
+| **End-to-End GridSearchCV** | 5 | `classifier__` prefixed grid — 36 candidates × 5 folds = 180 fits |
+| **Baseline Comparison** | 5 | Dummy (0.650 / 0.0000) vs. Untuned (0.965 / 0.9504) vs. Tuned (0.975 / 0.9645) |
+| **Confusion Matrix Reporting** | 5 | Heatmap + classification report for the tuned pipeline |
 
 ---
 
@@ -81,6 +91,9 @@ BinX_Week_04/
 │   └── README.md
 ├── Day4/
 │   ├── Feature_Engineering_and_Tuning.ipynb
+│   └── README.md
+├── Day5-mini-project/
+│   ├── Tuned_End_to_End_Pipeline.ipynb
 │   └── README.md
 └── README.md          ← You are here
 ```
